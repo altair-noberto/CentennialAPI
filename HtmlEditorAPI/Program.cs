@@ -25,12 +25,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 // Cors Config
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://text-editor-for-centennial-project.vercel.app"));
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:5173"));
 app.UseHttpsRedirection();
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = 
-    new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Postagens")),
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Postagens")),
     RequestPath = "/Postagens"
 });
 

@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.IO;
+using System.Linq;
 
 namespace ImageUploaderAPI.Controllers
 {
@@ -19,6 +21,8 @@ namespace ImageUploaderAPI.Controllers
             string extension = file.Name.Split('.')[1];
             if (extension == "png" || extension == "jpg")
             {
+                using StreamWriter fileIndex = new("Upload//ImagesIndex.txt", append: true);
+                string host = "https://" + HttpContext.Request.Host.Value;
                 string fileName = file.Name.Split('.')[0] + DateTime.Now.Ticks + '.' + extension;
                 try
                 {
@@ -29,6 +33,7 @@ namespace ImageUploaderAPI.Controllers
                     }
                     requestReturn.Name = fileName;
                     requestReturn.result = StatusCode(StatusCodes.Status201Created);
+                    fileIndex.WriteLineAsync(fileName + ',' + host + "/Images/" + fileName);
                     return requestReturn;
                 }
                 catch (Exception)
@@ -44,6 +49,39 @@ namespace ImageUploaderAPI.Controllers
                 requestReturn.Name = "ArquivoInvalido";
                 return requestReturn;
             }
+        }
+
+        [HttpGet]
+        public List<ImageIndex> GetImages()
+        {
+           string[] images = System.IO.File.ReadAllLines("Upload//ImagesIndex.txt");
+           List<ImageIndex> imagesIndex = new List<ImageIndex>();
+           foreach (string image in images)
+           {
+                ImageIndex imgIndex = new ImageIndex(image.Split(',')[0], image.Split(',')[1]);
+                imagesIndex.Add(imgIndex);
+           }
+           return imagesIndex;
+        }
+
+        [HttpDelete]
+        public ActionResult Delete(string nome)
+        {
+            string[] images = System.IO.File.ReadAllLines("Upload//ImagesIndex.txt");
+            string indexToRemove;
+            List<ImageIndex> imagesIndex = new List<ImageIndex>();
+            foreach (string image in images)
+            {
+                if (image.Split(',')[0] == nome)
+                {
+                   indexToRemove = image;
+                   System.IO.File.Delete("Upload//Images/" + image.Split(',')[0]);
+                   images = images.Where(i => i != indexToRemove).ToArray();
+                   System.IO.File.WriteAllLinesAsync("Upload//ImagesIndex.txt", images);
+                   return Ok();
+                }
+            }
+            return BadRequest();
         }
     }
 }

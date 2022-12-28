@@ -39,7 +39,8 @@ namespace HtmlEditorAPI.Controllers
                     }
                     publicacao.Title = pubData.title;
                     publicacao.SubTitle = pubData.subtitle;
-                    publicacao.PubData = DateTime.Now;
+                    DateTime dateTime = DateTime.Now;
+                    publicacao.PubData = String.Format("{0:dd/MM/yyyy}", dateTime);
                     publicacao.PubDirectory = host + $"/Postagens/{pubData.title.Replace(" ", "%20")}/{pubName}";
                     publicacao.ImgDirectory = host + $"/Postagens/{pubData.title.Replace(" ", "%20")}/{imgName}";
                     _context.Publicacoes.Add(publicacao);
@@ -55,6 +56,58 @@ namespace HtmlEditorAPI.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpPut]
+        [Route("UpdatePub")]
+        public async Task<ActionResult> Update([FromForm] PubDataUpdate pubData)
+        {
+            try
+            {
+                var pub = _context.Publicacoes.Where(t => t.Id == Int32.Parse(pubData.id)).FirstOrDefault();
+                if(pub == null)
+                {
+                    return BadRequest("Publicação não encontrada");
+                }
+                else
+                {
+                    string host = "https://" + HttpContext.Request.Host.Value;
+                    string imgExtension = pubData.img.FileName.Split('.')[1];
+                    if (imgExtension == "jpg" || imgExtension == "png")
+                    {
+                        string Folder = Path.Combine(Directory.GetCurrentDirectory(), $"Postagens\\{pub.Title}");
+                        string newFolder = Path.Combine(Directory.GetCurrentDirectory(), $"Postagens\\{pubData.title}");
+                        Directory.Delete(Folder, true);
+                        Directory.CreateDirectory(newFolder);
+                        string imgName = pubData.title + '.' + imgExtension;
+                        string pubName = pubData.title + ".html";
+                        using (Stream stream = new FileStream(Path.Combine(newFolder, imgName), FileMode.Create))
+                        {
+                            pubData.img.CopyTo(stream);
+                        }
+                        using (Stream stream = new FileStream(Path.Combine(newFolder, pubName), FileMode.Create))
+                        {
+                            pubData.pub.CopyTo(stream);
+                        }
+                        pub.Title = pubData.title;
+                        pub.SubTitle = pubData.subtitle;
+                        pub.ImgDirectory = host + $"/Postagens/{pubData.title.Replace(" ", "%20")}/{imgName}";
+                        pub.PubDirectory = host + $"/Postagens/{pubData.title.Replace(" ", "%20")}/{pubName}";
+                        _context.Entry(pub).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                        return Ok("Publicação atualizada com sucesso");
+                    }
+                    else
+                    {
+                        return BadRequest("Arquivo de imagem não suportado");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ex.Message);
+            }
+        }
+
         [HttpGet("{id:int}", Name = "GetPub")]
         public ActionResult<Publicacao> GetPub(int id)
         {
@@ -82,6 +135,7 @@ namespace HtmlEditorAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeletePub(int id)
         {

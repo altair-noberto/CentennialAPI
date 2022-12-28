@@ -19,6 +19,6 @@ namespace HtmlEditorAPI.Classes
         [StringLength(500)]
         public string ImgDirectory { get; set; }
         [Required]
-        public DateTime PubData { get; set; }
+        public string PubData { get; set; }
     }
 }

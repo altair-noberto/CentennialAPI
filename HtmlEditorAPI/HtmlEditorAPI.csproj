@@ -7,6 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Postagens\Bom dia2\**" />
+    <Content Remove="Postagens\Bom dia2\**" />
+    <EmbeddedResource Remove="Postagens\Bom dia2\**" />
+    <None Remove="Postagens\Bom dia2\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Teste.txt" />
+    <None Remove="Upload\Images\Index02638078304367332133.png" />
+    <None Remove="Upload\Images\Teste Indexamento638078302057131769.png" />
+    <None Remove="Upload\Images\Teste Indexamento638078303555923732.png" />
+    <None Remove="Upload\Images\Teste Indexamento638078303924762478.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
       <PrivateAssets>all</PrivateAssets>
