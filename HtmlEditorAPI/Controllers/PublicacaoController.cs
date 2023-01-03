@@ -71,6 +71,29 @@ namespace HtmlEditorAPI.Controllers
                 else
                 {
                     string host = "https://" + HttpContext.Request.Host.Value;
+                    if(pubData.img.FileName == "imageNull")
+                    {
+                        string Folder = Path.Combine(Directory.GetCurrentDirectory(), $"Postagens\\{pub.Title}");
+                        string newFolder = Path.Combine(Directory.GetCurrentDirectory(), $"Postagens\\{pubData.title}");
+                        string imgExt = pub.ImgDirectory.Split('.').Last();
+                        string imgName = pubData.title + '.' + imgExt;
+                        System.IO.File.Move(Path.Combine(Directory.GetCurrentDirectory(), $"Postagens\\{pub.Title}\\{pub.Title}.{imgExt}"), $"Postagens\\{pub.Title}\\{imgName}");
+                        string pubName = pubData.title + ".html";
+                        Directory.Move(Folder, newFolder);
+                        Directory.CreateDirectory(newFolder);
+                        using (Stream stream = new FileStream(Path.Combine(newFolder, pubName), FileMode.Create))
+                        {
+                            pubData.pub.CopyTo(stream);
+                        }
+                        System.IO.File.Delete(newFolder + $"\\{pub.Title}.html");
+                        pub.Title = pubData.title;
+                        pub.SubTitle = pubData.subtitle;
+                        pub.PubDirectory = host + $"/Postagens/{pubData.title.Replace(" ", "%20")}/{pubName}";
+                        pub.ImgDirectory = host + $"/Postagens/{pubData.title.Replace(" ", "%20")}/{pubData.title}.{imgExt}";
+                        _context.Entry(pub).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                        return Ok("Publicação atualizada com sucesso");
+                    }
                     string imgExtension = pubData.img.FileName.Split('.')[1];
                     if (imgExtension == "jpg" || imgExtension == "png")
                     {
