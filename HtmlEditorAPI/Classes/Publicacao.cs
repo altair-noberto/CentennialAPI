@@ -14,6 +14,9 @@ namespace HtmlEditorAPI.Classes
         public string SubTitle { get; set; }
         [Required]
         [StringLength(500)]
+        public string Category { get; set; }
+        [Required]
+        [StringLength(500)]
         public string PubDirectory { get; set; }
         [Required]
         [StringLength(500)]

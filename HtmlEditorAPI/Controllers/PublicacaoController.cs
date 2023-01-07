@@ -39,6 +39,7 @@ namespace HtmlEditorAPI.Controllers
                     }
                     publicacao.Title = pubData.title;
                     publicacao.SubTitle = pubData.subtitle;
+                    publicacao.Category = pubData.categoria;
                     DateTime dateTime = DateTime.Now;
                     publicacao.PubData = String.Format("{0:dd/MM/yyyy}", dateTime);
                     publicacao.PubDirectory = host + $"/Postagens/{pubData.title.Replace(" ", "%20")}/{pubName}";
