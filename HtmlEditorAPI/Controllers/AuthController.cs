@@ -34,6 +34,28 @@ namespace CentennialAPI.Controllers
             return Ok(userName);
         }
 
+        [HttpGet("{id:int}")]
+        public ActionResult<UserPublicModel> GetUserById(int id) {
+            try
+            {
+                var user = _context.Users.Where(u => u.Id == id).FirstOrDefault();
+                if(user == null)
+                {
+                    return BadRequest("Usuário não encontrado");
+                }
+                UserPublicModel userModel = new UserPublicModel();
+                userModel.id = id;
+                userModel.Name = user.Nome;
+                userModel.Email = user.Email;
+
+                return Ok(userModel);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("registrarAdmin"), Authorize(Roles = "Admin")]
         public ActionResult<User> RegisterAdmin(UserDto request)
         {
