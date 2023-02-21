@@ -1,4 +1,5 @@
 ﻿using HtmlEditorAPI.Classes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +15,7 @@ namespace HtmlEditorAPI.Controllers
         {
             _context = context;
         }
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Admin")]
         [Route("SavePub")]
         public ActionResult Post([FromForm] PubData pubData)
         {
@@ -58,13 +59,13 @@ namespace HtmlEditorAPI.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut, Authorize(Roles = "Admin")]
         [Route("UpdatePub")]
         public async Task<ActionResult> Update([FromForm] PubDataUpdate pubData)
         {
             try
             {
-                var pub = _context.Publicacoes.Where(t => t.Id == Int32.Parse(pubData.id)).FirstOrDefault();
+                var pub = _context.Publicacoes.Where(t => t.Id == pubData.id).FirstOrDefault();
                 if(pub == null)
                 {
                     return BadRequest("Publicação não encontrada");
@@ -160,7 +161,7 @@ namespace HtmlEditorAPI.Controllers
             }
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}"), Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeletePub(int id)
         {
             try

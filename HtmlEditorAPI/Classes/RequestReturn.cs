@@ -6,7 +6,7 @@ namespace HtmlEditorAPI.Classes
     [NotMapped]
     public class RequestReturn
     {
-        public string Name { get; set; }
-        public ActionResult result { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public ActionResult? result { get; set; }
     }
 }
